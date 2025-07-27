@@ -1,6 +1,6 @@
 'use server';
 
-import { isRedirectError } from 'next/dist/client/components/redirect';
+import { getRedirectError } from 'next/dist/client/components/redirect';
 import { convertToPlainObject, formatError } from '../utils';
 import { auth } from '@/auth';
 import { getMyCart } from './cart.actions';
@@ -98,7 +98,8 @@ export async function createOrder() {
       redirectTo: `/order/${insertedOrderId}`,
     };
   } catch (error) {
-    if (isRedirectError(error)) throw error;
+    // If this is a Next.js redirect error, rethrow it
+    if (error && typeof error === 'object' && 'digest' in error) throw error;
     return { success: false, message: formatError(error) };
   }
 }
